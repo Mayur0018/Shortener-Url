@@ -1,38 +1,53 @@
 const { getUser } = require("../Service/auth");
 
-async function restrictToLoggeedinUserOnly(req, res, next) {
-  try {
-    const userId = req.headers["authorization"];
-    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+function checkForAuthentication(req, res, next) {
+  const authorizationHeaderValue = req.headers["Authorization"];
+  req.user = null;
+  if (
+    !authorizationHeaderValue ||
+    !authorizationHeaderValue.startWith("Bearer")
+  )
+    return next();
 
-    const token = userId.split("Bearer ")[1]?.trim();
-    if (!token) return res.status(401).json({ error: "Unauthorized" });
-
-    const user = await getUser(token); // Assuming getUser is async
-    if (!user) return res.status(401).json({ error: "Unauthorized" });
-
-    req.user = user;
-    next();
-  } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+  const token = authorizationHeaderValue.split("Bearer")[1];
+  const user = getUser(token);
+  req.user = user;
+  return next();
 }
+// async function restrictToLoggeedinUserOnly(req, res, next) {
+//   const userId = req.headers["Authorization"];
+//   if (!userId) return res.redirect("/login");
+//   const token = userId.split("Bearer")[1];
+//   const user = getUser(token);
+//   if (!user) return res.redirect("/login");
 
-async function checkAuth(req, res, next) {
-  try {
-    const userId = req.headers["authorization"];
-    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+//   req.user = user;
+//   next();
+// }
 
-    const token = userId.split("Bearer ")[1]?.trim();
-    const user = token ? await getUser(token) : null; // Assuming getUser is async
-    req.user = user || null; // Attach user or null
-    next();
-  } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+// async function checkAuth(req, res, next) {
+//   const userId = req.headers["authorization"];
+//   const token = userId.split("Bearer")[1];
+//   const user = getUser(token);
+//   req.user = user;
+//   next();
+// }
+
+function restrictTo(role = []) {
+  return function (req, res, next) {
+    if (!req.user) {
+      return res.redirect("/login");
+    }
+    if (!req.includes(req.user.role)) {
+      return res.end("UnAuthorized");
+    }
+
+    return next();
+  };
 }
-
 module.exports = {
-  restrictToLoggeedinUserOnly,
-  checkAuth,
+  // restrictToLoggeedinUserOnly,
+  // checkAuth,
+  checkForAuthentication,
+  restrictTo
 };

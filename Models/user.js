@@ -10,6 +10,11 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    role: {
+      type: String,
+      required: true,
+      default:"NORMAL",
+    },
     password: {
       type: String,
       required: true,
@@ -18,7 +23,6 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-
-const User = mongoose.model("UserLogin",userSchema);;
+const User = mongoose.model("UserLogin", userSchema);
 
 module.exports = User;
