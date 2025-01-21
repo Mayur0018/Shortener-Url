@@ -1,7 +1,7 @@
 const { getUser } = require("../Service/auth");
 
 function checkForAuthentication(req, res, next) {
-  const authorizationHeaderValue = req.headers["Authorization"];
+  const authorizationHeaderValue = req.cookies["token"];
   req.user = null;
   if (
     !authorizationHeaderValue ||
@@ -49,5 +49,5 @@ module.exports = {
   // restrictToLoggeedinUserOnly,
   // checkAuth,
   checkForAuthentication,
-  restrictTo
+  restrictTo,
 };

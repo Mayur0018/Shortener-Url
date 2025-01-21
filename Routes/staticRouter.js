@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const {} = require("../Middlewares/auth")
 const URL = require("../Models/url");
 router.get("/", async (req, res) => {
   if(!req.user) return res.redirect("/login")

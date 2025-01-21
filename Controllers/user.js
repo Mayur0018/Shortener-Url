@@ -20,8 +20,8 @@ async function handleUserLogin(req, res) {
       error: "InValid UserName Or Password",
     });
   const tokken = setUser(user);
-  // res.cookie("uid", tokken);
-  return res.json({tokken});
+  res.cookie("token", tokken);
+  return res.redirect("/");
 }
 
 module.exports = {

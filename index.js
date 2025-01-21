@@ -3,7 +3,7 @@ const app = express();
 const PORT = 8000;
 const path = require("path");
 const cookieParser = require("cookie-parser");
-const { checkForAuthentication,restrictTo } = require("./Middlewares/auth");
+const { checkForAuthentication, restrictTo } = require("./Middlewares/auth");
 const { ConnectionMongodb } = require("./connect");
 const URL = require("./Models/url");
 
@@ -21,10 +21,10 @@ app.set("views", path.resolve("./views"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(checkForAuthentication)
-app.use("/url", restrictTo("NORMAL"), urlRoutes);
+app.use(checkForAuthentication);
+app.use("/url", restrictTo(["NORMAL"]), urlRoutes);
 app.use("/user", userRoute);
-app.use("/", checkForAuthentication, staticRoute);
+app.use("/", staticRoute);
 
 app.get("/url/:shortId", async (req, res) => {
   const shortId = req.params.shortId;
@@ -33,7 +33,7 @@ app.get("/url/:shortId", async (req, res) => {
       shortId,
     },
     {
-      $push: {   
+      $push: {
         visitHistory: {
           timestamps: Date.now(),
         },
